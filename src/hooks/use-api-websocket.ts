@@ -1,5 +1,6 @@
 import useWebSocket from 'react-use-websocket';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { RoomCommands } from 'types/room-messages.enum';
 import { apiWsUrl } from '../env';
 import type { RoomMessageBase } from '../types/room-message-base';
 import type { StateChangedEvent } from '../types/events/state-changed.event';
@@ -16,7 +17,7 @@ export const useApiWebSocket = (): UseApiWebSocket => {
   const wsOptions: WsOptions = {
     share: true,
     shouldReconnect: () => true,
-    reconnectAttempts: 60,
+    reconnectAttempts: 20,
     reconnectInterval: 3,
     retryOnError: true,
   };
@@ -24,6 +25,11 @@ export const useApiWebSocket = (): UseApiWebSocket => {
 
   const room = (lastJsonMessage as StateChangedEvent)?.room;
   const sendCommand = useCallback((command: RoomMessageBase) => sendJsonMessage(command as any), [sendJsonMessage]);
+
+  useEffect(() => {
+    const interval = setInterval(() => sendCommand({ event: RoomCommands.Resync, ts: new Date().toISOString() }), 50000);
+    return () => clearInterval(interval);
+  }, [sendCommand]);
 
   return { room, sendCommand, readyState };
 };
