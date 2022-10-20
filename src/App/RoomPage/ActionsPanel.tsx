@@ -39,6 +39,21 @@ export const ActionsPanel = () => {
 
   return (
     <Card sx={{ p: 2 }}>
+      <Typography variant="h5" gutterBottom>Cards</Typography>
+      <Box display="flex" flexWrap="wrap">
+        {cards.map((value) => (
+          <Button
+            key={value}
+            variant="outlined"
+            onClick={selectCard(value)}
+            sx={{ m: 1, fontSize: 20, color: 'inherit' }}
+            disabled={disabled}
+          >
+            {value}
+          </Button>
+        ))}
+      </Box>
+      <Divider sx={{ my: 2 }} />
       <Typography variant="h5">Actions</Typography>
       <List>
         <ListItem>
@@ -78,21 +93,6 @@ export const ActionsPanel = () => {
           </Button>
         </ListItem>
       </List>
-      <Divider sx={{ my: 2 }} />
-      <Typography variant="h5" gutterBottom>Cards</Typography>
-      <Box display="flex" flexWrap="wrap">
-        {cards.map((value) => (
-          <Button
-            key={value}
-            variant="outlined"
-            onClick={selectCard(value)}
-            sx={{ m: 1, fontSize: 20, color: 'inherit' }}
-            disabled={disabled}
-          >
-            {value}
-          </Button>
-        ))}
-      </Box>
       <Divider sx={{ my: 2 }} />
       <Typography variant="h5" gutterBottom>Stats</Typography>
       <Box>

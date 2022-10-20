@@ -17,7 +17,7 @@ export const CardGrid = () => {
   };
 
   return (
-    <Box display="flex" flexWrap="wrap" alignContent="space-around" justifyContent="space-around">
+    <Box display="flex" flexWrap="wrap" alignContent="center" justifyContent="center" height="100%">
       {room?.users.map((user: User) => (
         <Card
           key={user.id}

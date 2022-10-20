@@ -15,8 +15,10 @@ export interface UseApiWebSocket {
 export const useApiWebSocket = (): UseApiWebSocket => {
   const wsOptions: WsOptions = {
     share: true,
-    reconnectAttempts: 12,
-    reconnectInterval: 5,
+    shouldReconnect: () => true,
+    reconnectAttempts: 60,
+    reconnectInterval: 3,
+    retryOnError: true,
   };
   const { lastJsonMessage, sendJsonMessage, readyState } = useWebSocket(apiWsUrl, wsOptions);
 
