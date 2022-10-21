@@ -5,15 +5,18 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import { Box, Button, Card, Divider, List, ListItem, Stack, Typography } from '@mui/material';
 import { useApiWebSocket } from 'hooks/use-api-websocket';
 import { RoomCommands } from 'types/room-messages.enum';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ReadyState } from 'react-use-websocket';
 import { Stopwatch } from './Stopwatch';
+import type { User } from 'types/user';
 
 const cards = ['0', '1', '3', '5', '8', '13', '20', '40', '100', '?', '∞', '💩', '☕', '🍺', '🥃'];
 
 export const ActionsPanel = () => {
   const { readyState } = useApiWebSocket();
   const { room, sendCommand } = useApiWebSocket();
+
+  const [lastCard, setLastCard] = useState<string | null>(null);
 
   const disabled = readyState !== ReadyState.OPEN;
 
@@ -22,7 +25,12 @@ export const ActionsPanel = () => {
   const toggleCardVisibility = () => sendCommand({ event: RoomCommands.ToggleCardVisibility, ts: new Date().toISOString() });
   const resetCards = () => sendCommand({ event: RoomCommands.ResetCards, ts: new Date().toISOString() });
 
-  const selectCard = (card: string) => () => sendCommand({ event: RoomCommands.SetCard, card, ts: new Date().toISOString() });
+  const selectCard = (card: string) => () => {
+    setLastCard(card);
+    sendCommand({ event: RoomCommands.SetCard, card, ts: new Date().toISOString() });
+  };
+
+  const isCleared = room?.users.map((u: User) => u.card).reduce((acc, hasCard) => (acc && !hasCard), true);
 
   const stats = useMemo(() => {
     if (disabled) return { average: '-', maxUsers: '-', minUsers: '-' };
@@ -44,7 +52,8 @@ export const ActionsPanel = () => {
         {cards.map((value) => (
           <Button
             key={value}
-            variant="outlined"
+            // Highlight clicked cards even when hidden, unless cleared
+            variant={!isCleared && lastCard === value ? 'contained' : 'outlined'}
             onClick={selectCard(value)}
             sx={{ m: 1, fontSize: 20, color: 'inherit' }}
             disabled={disabled}
