@@ -14,10 +14,10 @@ export const RoomPage = () => {
 
   return (
     <Grid container spacing={2} p={3} height="100%">
-      <Grid item xl={10} md={8} xs={12}>
+      <Grid item xl={9} md={8} xs={12}>
         <CardGrid />
       </Grid>
-      <Grid item xl={2} md={4} xs={12}>
+      <Grid item xl={3} md={4} xs={12}>
         <Stack direction="column" spacing={2}>
           <ActionsPanel />
         </Stack>

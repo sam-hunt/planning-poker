@@ -2,7 +2,7 @@ import SyncIcon from '@mui/icons-material/Sync';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Box, Button, Card, Divider, List, ListItem, Stack, Typography } from '@mui/material';
+import { Box, Button, Card, Divider, Grid, Stack, Typography } from '@mui/material';
 import { useApiWebSocket } from 'hooks/use-api-websocket';
 import { RoomCommands } from 'types/room-messages.enum';
 import { useMemo, useState } from 'react';
@@ -20,7 +20,6 @@ export const ActionsPanel = () => {
 
   const disabled = readyState !== ReadyState.OPEN;
 
-  const resync = () => sendCommand({ event: RoomCommands.Resync, ts: new Date().toISOString() });
   const reload = () => window.location.reload();
   const toggleCardVisibility = () => sendCommand({ event: RoomCommands.ToggleCardVisibility, ts: new Date().toISOString() });
   const resetCards = () => sendCommand({ event: RoomCommands.ResetCards, ts: new Date().toISOString() });
@@ -64,44 +63,49 @@ export const ActionsPanel = () => {
       </Box>
       <Divider sx={{ my: 2 }} />
       <Typography variant="h5">Actions</Typography>
-      <List>
-        <ListItem>
-          <Button
-            color="primary"
-            fullWidth
-            variant={room?.isRevealed ? 'outlined' : 'contained'}
-            endIcon={room?.isRevealed ? <VisibilityOffIcon /> : <VisibilityIcon />}
-            onClick={toggleCardVisibility}
-            disabled={disabled}
-          >
-            {room?.isRevealed ? 'Hide' : 'Show'}
-            &nbsp;Cards
-          </Button>
-        </ListItem>
-        <ListItem>
-          <Button
-            fullWidth
-            color="error"
-            variant={room?.isRevealed ? 'contained' : 'outlined'}
-            endIcon={<ReplayIcon />}
-            onClick={resetCards}
-            disabled={disabled}
-          >
-            Reset cards
-          </Button>
-        </ListItem>
-        <ListItem>
-          <Button
-            fullWidth
-            color="inherit"
-            variant="outlined"
-            endIcon={<SyncIcon />}
-            onClick={disabled ? reload : resync}
-          >
-            {disabled ? 'Reload' : 'Resync'}
-          </Button>
-        </ListItem>
-      </List>
+      <Grid container p={1} spacing={2}>
+        {disabled && (
+          <Grid item xl={12} md={12} xs={12}>
+            <Button
+              fullWidth
+              color="primary"
+              variant="contained"
+              endIcon={<SyncIcon />}
+              onClick={reload}
+            >
+              Reload
+            </Button>
+          </Grid>
+        )}
+        {!disabled && (
+          <>
+            <Grid item xl={6} md={6} xs={12}>
+              <Button
+                fullWidth
+                color="primary"
+                variant={room?.isRevealed ? 'outlined' : 'contained'}
+                endIcon={room?.isRevealed ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                onClick={toggleCardVisibility}
+                disabled={disabled}
+              >
+                {room?.isRevealed ? 'Hide' : 'Show'}
+              </Button>
+            </Grid>
+            <Grid item xl={6} md={6} xs={12}>
+              <Button
+                fullWidth
+                color="error"
+                variant={room?.isRevealed ? 'contained' : 'outlined'}
+                endIcon={<ReplayIcon />}
+                onClick={resetCards}
+                disabled={disabled}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </>
+        )}
+      </Grid>
       <Divider sx={{ my: 2 }} />
       <Typography variant="h5" gutterBottom>Stats</Typography>
       <Box>
