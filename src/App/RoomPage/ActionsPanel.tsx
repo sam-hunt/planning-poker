@@ -5,7 +5,7 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import { Box, Button, Card, Divider, Grid, Stack, Typography } from '@mui/material';
 import { useApiWebSocket } from 'hooks/use-api-websocket';
 import { RoomCommands } from 'types/room-messages.enum';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ReadyState } from 'react-use-websocket';
 import { Stopwatch } from './Stopwatch';
 import type { User } from 'types/user';
@@ -29,7 +29,11 @@ export const ActionsPanel = () => {
     sendCommand({ event: RoomCommands.SetCard, card, ts: new Date().toISOString() });
   };
 
-  const isCleared = room?.users.map((u: User) => u.card).reduce((acc, hasCard) => (acc && !hasCard), true);
+  useEffect(() => {
+    // Clear the last card button highlight when the room is reset
+    const noCardsSelected = room?.users.every((u: User) => !u.card);
+    if (noCardsSelected && !room?.isRevealed) setLastCard(null);
+  }, [room]);
 
   const stats = useMemo(() => {
     if (disabled) return { average: '-', maxUsers: '-', minUsers: '-' };
@@ -52,7 +56,7 @@ export const ActionsPanel = () => {
           <Button
             key={value}
             // Highlight clicked cards even when hidden, unless cleared
-            variant={!isCleared && lastCard === value ? 'contained' : 'outlined'}
+            variant={lastCard === value ? 'contained' : 'outlined'}
             onClick={selectCard(value)}
             sx={{ m: 1, fontSize: 20, color: 'inherit' }}
             disabled={disabled}
