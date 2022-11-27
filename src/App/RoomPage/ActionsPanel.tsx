@@ -10,7 +10,7 @@ import { ReadyState } from 'react-use-websocket';
 import { Stopwatch } from './Stopwatch';
 import type { User } from 'types/user';
 
-const cards = ['0', '1', '3', '5', '8', '13', '20', '40', '100', '?', '∞', '💩', '☕', '🍺', '🥃'];
+const cards = ['0', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '∞', '☕', '🍺', '🥃'];
 
 export const ActionsPanel = () => {
   const { readyState } = useApiWebSocket();
