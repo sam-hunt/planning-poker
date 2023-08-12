@@ -44,7 +44,7 @@ export const CardGrid = () => {
                 </Typography>
               )}
             </Box>
-            <Typography color={userColor(user)}>{user.name || 'Someone'}</Typography>
+            <Typography color={userColor(user)}>{user.name?.slice(0, 16) || 'Someone'}</Typography>
           </Stack>
         </Card>
       ))}

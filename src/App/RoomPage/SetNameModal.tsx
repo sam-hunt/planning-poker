@@ -1,7 +1,8 @@
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, IconButton, Modal, Stack, TextField, Typography, useTheme } from '@mui/material';
+import { Box, IconButton, InputAdornment, Modal, Stack, TextField, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
+import type { ChangeEventHandler } from 'react';
 
 interface SetNameModalProps {
   isOpen: boolean;
@@ -15,8 +16,10 @@ export const SetNameModal = ({ isOpen, value, onChange, onClose }: SetNameModalP
   const theme = useTheme();
   const { modalBoxStyle } = theme.mixins;
 
+  const onTextChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => setNewUsername(event.target.value.slice(0, 16));
+
   const onClickDone = () => {
-    onChange(newUsername);
+    onChange(newUsername.slice(0, 16));
     onClose();
   };
 
@@ -33,10 +36,23 @@ export const SetNameModal = ({ isOpen, value, onChange, onClose }: SetNameModalP
       <Box sx={modalBoxStyle}>
         <Stack direction="column" spacing={2}>
           <Typography id="set-name-modal-title" variant="h5" component="h2">
-            Set new username
+            Set name
           </Typography>
           <Stack direction="row">
-            <TextField fullWidth value={newUsername} onChange={(event) => setNewUsername(event.target.value)} size="small" sx={{ mr: 1 }} />
+            <TextField
+              fullWidth
+              value={newUsername}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {newUsername.length}
+                    /16
+                  </InputAdornment>),
+              }}
+              onChange={onTextChange}
+              size="small"
+              sx={{ mr: 1 }}
+            />
             <IconButton onClick={onClickDone} color="success">
               <CheckIcon />
             </IconButton>
