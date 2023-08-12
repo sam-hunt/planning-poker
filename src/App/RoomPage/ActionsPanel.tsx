@@ -4,6 +4,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { Box, Button, Card, Divider, Grid, Stack, Typography } from '@mui/material';
 import { useApiWebSocket } from 'hooks/use-api-websocket';
+import { useUserContext } from 'hooks/use-user-context';
 import { RoomCommands } from 'types/room-messages.enum';
 import { useEffect, useMemo, useState } from 'react';
 import { ReadyState } from 'react-use-websocket';
@@ -15,6 +16,7 @@ const cards = ['0', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '∞'
 export const ActionsPanel = () => {
   const { readyState } = useApiWebSocket();
   const { room, sendCommand } = useApiWebSocket();
+  const { userIsSpectating } = useUserContext();
 
   const [lastCard, setLastCard] = useState<string | null>(null);
 
@@ -50,22 +52,26 @@ export const ActionsPanel = () => {
 
   return (
     <Card sx={{ p: 2 }}>
-      <Typography variant="h5" gutterBottom>Cards</Typography>
-      <Box display="flex" flexWrap="wrap">
-        {cards.map((value) => (
-          <Button
-            key={value}
-            // Highlight clicked cards even when hidden, unless cleared
-            variant={lastCard === value ? 'contained' : 'outlined'}
-            onClick={selectCard(value)}
-            sx={{ m: 1, fontSize: 20, color: 'inherit' }}
-            disabled={disabled}
-          >
-            {value}
-          </Button>
-        ))}
-      </Box>
-      <Divider sx={{ my: 2 }} />
+      {!userIsSpectating && (
+        <>
+          <Typography variant="h5" gutterBottom>Cards</Typography>
+          <Box display="flex" flexWrap="wrap">
+            {cards.map((value) => (
+              <Button
+                key={value}
+                // Highlight clicked cards even when hidden, unless cleared
+                variant={lastCard === value ? 'contained' : 'outlined'}
+                onClick={selectCard(value)}
+                sx={{ m: 1, fontSize: 20, color: 'inherit' }}
+                disabled={disabled}
+              >
+                {value}
+              </Button>
+            ))}
+          </Box>
+          <Divider sx={{ my: 2 }} />
+        </>
+      )}
       <Typography variant="h5">Actions</Typography>
       <Grid container p={1} spacing={2}>
         {disabled && (
@@ -92,7 +98,7 @@ export const ActionsPanel = () => {
                 onClick={toggleCardVisibility}
                 disabled={disabled}
               >
-                {room?.isRevealed ? 'Hide' : 'Show'}
+                {room?.isRevealed ? 'Hide' : 'Reveal'}
               </Button>
             </Grid>
             <Grid item xl={6} md={6} xs={12}>

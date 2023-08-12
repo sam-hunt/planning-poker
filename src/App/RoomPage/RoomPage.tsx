@@ -1,25 +1,27 @@
-import { Grid, Stack } from '@mui/material';
-import { useApiWebSocket } from 'hooks/use-api-websocket';
-import { useLocalStorage } from 'hooks/use-local-storage';
-import { useEffect } from 'react';
-import { RoomCommands } from 'types/room-messages.enum';
+import { Box, Grid, Stack } from '@mui/material';
+import { useUserContext } from 'hooks/use-user-context';
+import { useMountEffect } from 'hooks/use-mount-effect';
 import { ActionsPanel } from './ActionsPanel';
-import { CardGrid } from './CardGrid';
+import { PokerCardGrid } from './PokerCardGrid';
 
 export const RoomPage = () => {
-  const { sendCommand } = useApiWebSocket();
-  const [username] = useLocalStorage('planningpoker-username', '');
+  const { username, userIsSpectating, setUsername, setUserIsSpectating } = useUserContext();
 
-  useEffect(() => sendCommand({ event: RoomCommands.SetUsername, username, ts: new Date().toISOString() }), [sendCommand, username]);
+  useMountEffect(() => {
+    // Restore local values from previous session
+    setUsername(username);
+    setUserIsSpectating(userIsSpectating);
+  });
 
   return (
-    <Grid container spacing={2} p={3} height="100%">
+    <Grid container spacing={2} p={3} height="100%" minHeight="100%">
       <Grid item xl={9} md={8} xs={12}>
-        <CardGrid />
+        <PokerCardGrid />
       </Grid>
-      <Grid item xl={3} md={4} xs={12}>
-        <Stack direction="column" spacing={2}>
+      <Grid item xl={3} md={4} xs={12} height="100%">
+        <Stack direction="column" spacing={2} height="100%" minHeight="100%">
           <ActionsPanel />
+          <Box flex={1} />
         </Stack>
       </Grid>
     </Grid>

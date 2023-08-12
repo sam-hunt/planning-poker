@@ -1,32 +1,33 @@
-import SettingsIcon from '@mui/icons-material/Settings';
+import { useContext, useState } from 'react';
+import { ReadyState } from 'react-use-websocket';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import CasinoIcon from '@mui/icons-material/Casino';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import PendingIcon from '@mui/icons-material/Pending';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { AppBar, Toolbar, Typography, IconButton, Tooltip, useTheme } from '@mui/material';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useApiWebSocket } from 'hooks/use-api-websocket';
-import { useContext, useState } from 'react';
-import { RoomCommands } from 'types/room-messages.enum';
-import { useLocalStorage } from 'hooks/use-local-storage';
-import { ReadyState } from 'react-use-websocket';
+import { useUserContext } from 'hooks/use-user-context';
 import { ThemeContext } from './ThemeProvider';
-import { SetNameModal } from './RoomPage/SetNameModal';
+import { UserSettingsModal } from './RoomPage/UserSettingsModal';
 
 export const Header = () => {
-  const { sendCommand, readyState } = useApiWebSocket();
+  const { readyState } = useApiWebSocket();
   const { toggleTheme } = useContext(ThemeContext);
 
   const theme = useTheme();
 
-  const [username, setUsername] = useLocalStorage('planningpoker-username', '');
-  const [isSetNameModalOpen, setIsSetNameModalOpen] = useState(false);
-  const openSetNameModal = () => setIsSetNameModalOpen(true);
-  const closeSetNameModal = () => setIsSetNameModalOpen(false);
-  const onSetNameModalChange = (newUsername: string) => {
-    sendCommand({ event: RoomCommands.SetUsername, username: newUsername, ts: new Date().toISOString() });
+  const { username, userIsSpectating, setUsername, setUserIsSpectating } = useUserContext();
+
+  const [isUserSettingsModalOpen, setIsUserSettingsModalOpen] = useState(false);
+  const openUserSettingsModal = () => setIsUserSettingsModalOpen(true);
+  const closeUserSettingsModal = () => setIsUserSettingsModalOpen(false);
+
+  const onUserSettingsModalChange = (newUsername: string, isSpectating: boolean) => {
     setUsername(newUsername);
+    setUserIsSpectating(isSpectating);
   };
 
   return (
@@ -59,11 +60,18 @@ export const Header = () => {
           </IconButton>
         </Tooltip>
         <Tooltip title="Set Username">
-          <IconButton sx={{ ml: 1 }} onClick={openSetNameModal} color="inherit">
+          <IconButton sx={{ ml: 1 }} onClick={openUserSettingsModal} color="inherit">
             <SettingsIcon />
           </IconButton>
         </Tooltip>
-        <SetNameModal isOpen={isSetNameModalOpen} value={username} onChange={onSetNameModalChange} onClose={closeSetNameModal} />
+        {/* TODO: refactor to react-hook-form */}
+        <UserSettingsModal
+          isOpen={isUserSettingsModalOpen}
+          username={username}
+          isSpectating={userIsSpectating}
+          onChange={onUserSettingsModalChange}
+          onClose={closeUserSettingsModal}
+        />
       </Toolbar>
     </AppBar>
   );

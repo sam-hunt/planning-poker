@@ -26,7 +26,7 @@ module.exports = {
         'indent': 'off',
 
         // Because long file lengths reduce readability. Also nobody reads imports so their readability value is less
-        'max-len': ['error', 150],
+        'max-len': ['error', 180],
         '@typescript-eslint/lines-between-class-members': 'off',
         'object-curly-newline': ['error', { 'ImportDeclaration': 'never' }],
 
