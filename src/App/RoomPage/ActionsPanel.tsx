@@ -20,7 +20,7 @@ export const ActionsPanel = () => {
 
   const [lastCard, setLastCard] = useState<string | null>(null);
 
-  const disabled = readyState !== ReadyState.OPEN;
+  const notConnected = readyState !== ReadyState.OPEN;
 
   const reload = () => window.location.reload();
   const toggleCardVisibility = () => sendCommand({ event: RoomCommands.ToggleCardVisibility, ts: new Date().toISOString() });
@@ -38,7 +38,7 @@ export const ActionsPanel = () => {
   }, [room]);
 
   const stats = useMemo(() => {
-    if (disabled) return { average: '-', maxUsers: '-', minUsers: '-' };
+    if (notConnected) return { average: '-', maxUsers: '-', minUsers: '-' };
     if (!room || !room.isRevealed) return { average: '?', maxUsers: '?', minUsers: '?' };
     const numericCards = room?.users.map((user) => parseInt(user.card, 10)).filter((n) => !Number.isNaN(n)) || [];
     const sum = numericCards.reduce((acc, val) => acc + val, 0);
@@ -48,7 +48,7 @@ export const ActionsPanel = () => {
     const minValue = Math.min(...numericCards);
     const minUsers = room?.users.filter((user) => user.card === minValue.toString(10)).map((user) => user.name).join(', ') || '?';
     return { average, maxUsers, minUsers };
-  }, [room, disabled]);
+  }, [room, notConnected]);
 
   return (
     <Card sx={{ p: 2 }}>
@@ -63,7 +63,7 @@ export const ActionsPanel = () => {
                 variant={lastCard === value ? 'contained' : 'outlined'}
                 onClick={selectCard(value)}
                 sx={{ m: 1, fontSize: 20, color: 'inherit' }}
-                disabled={disabled}
+                disabled={notConnected || room?.isRevealed}
               >
                 {value}
               </Button>
@@ -74,7 +74,7 @@ export const ActionsPanel = () => {
       )}
       <Typography variant="h5">Actions</Typography>
       <Grid container p={1} spacing={2}>
-        {disabled && (
+        {notConnected && (
           <Grid item xl={12} md={12} xs={12}>
             <Button
               fullWidth
@@ -87,7 +87,7 @@ export const ActionsPanel = () => {
             </Button>
           </Grid>
         )}
-        {!disabled && (
+        {!notConnected && (
           <>
             <Grid item xl={6} md={6} xs={12}>
               <Button
@@ -96,7 +96,7 @@ export const ActionsPanel = () => {
                 variant={room?.isRevealed ? 'outlined' : 'contained'}
                 endIcon={room?.isRevealed ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 onClick={toggleCardVisibility}
-                disabled={disabled}
+                disabled={notConnected}
               >
                 {room?.isRevealed ? 'Hide' : 'Reveal'}
               </Button>
@@ -108,7 +108,7 @@ export const ActionsPanel = () => {
                 variant={room?.isRevealed ? 'contained' : 'outlined'}
                 endIcon={<ReplayIcon />}
                 onClick={resetCards}
-                disabled={disabled}
+                disabled={notConnected}
               >
                 Reset
               </Button>
@@ -121,7 +121,7 @@ export const ActionsPanel = () => {
       <Box>
         <Stack direction="row" justifyContent="space-between" m={2}>
           <Typography>Timer:</Typography>
-          <Typography>{disabled ? '-' : <Stopwatch since={room?.lastResetAt} />}</Typography>
+          <Typography>{notConnected ? '-' : <Stopwatch since={room?.lastResetAt} />}</Typography>
         </Stack>
         <Stack direction="row" justifyContent="space-between" m={2}>
           <Typography>Average:</Typography>
