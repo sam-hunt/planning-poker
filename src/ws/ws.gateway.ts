@@ -1,46 +1,63 @@
 import { v4 as uuid } from 'uuid';
-import { OnGatewayConnection, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server as WsServer, WebSocket } from 'ws';
+import { OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets';
+import { WebSocket } from 'ws';
 import { RoomMessageBase } from '../room/messages/room-message-base';
-import { Room } from '../room/room';
 import { StateChangedEvent } from '../room/messages/events/state-changed.event';
 import { RoomEvents } from '../room/messages/room-messages.enum';
+import { URLSearchParams } from 'url';
+import { RoomService } from '../room/room.service';
+import { Room } from '../room/room';
 
 @WebSocketGateway({ path: '/ws' })
 export class WsGateway implements OnGatewayConnection {
-    @WebSocketServer()
-    private wsServer: WsServer;
+    private roomClients: Map<Room['id'], Set<WebSocket>> = new Map();
 
-    public constructor(private readonly room: Room) { }
+    public constructor(private readonly roomService: RoomService) {}
 
-    private sendToAll(message: RoomMessageBase) {
-        this.wsServer.clients.forEach(client => {
+    // TODO: Wrap send function in closure and pass to room to control message flow ?
+    private sendToRoom(roomId: Room['id'], message: RoomMessageBase) {
+        this.roomClients.get(roomId).forEach(client => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify(message), { binary: false });
             }
         });
     }
 
-    public handleConnection(client: WebSocket) {
+    public handleConnection(client: WebSocket, connection: { url: string }) {
+        const { url } = connection;
+        if (!url.includes('?')) client.close();
+        const roomId = new URLSearchParams(url.split('?')[1]).get('roomId');
+        if (!roomId) client.close();
+
+        const roomClients = this.roomClients.get(roomId) ?? new Set();
+        roomClients.add(client);
+        this.roomClients.set(roomId, roomClients);
+
         const userId = uuid();
-        this.room.handleConnection(userId);
+        this.roomService.handleConnection(userId, roomId);
+        const room = this.roomService.rooms.get(roomId);
 
         client.on('message', (data, isBinary) => {
             if (isBinary) return;
-            const message: RoomMessageBase = JSON.parse(data.toString('utf8'));
-            this.room.handleCommand(userId, message);
+            const message: RoomMessageBase = JSON.parse(data.toString('utf-8'));
+            this.roomService.handleCommand(userId, roomId, message);
             const ts = new Date().toISOString();
-            const stateChangedEvent: StateChangedEvent = { event: RoomEvents.StateChanged, room: this.room, ts };
-            this.sendToAll(stateChangedEvent);
+            const stateChangedEvent: StateChangedEvent = { event: RoomEvents.StateChanged, room, ts };
+            this.sendToRoom(roomId, stateChangedEvent);
         });
         client.on('close', () => {
-            this.room.handleDisconnection(userId);
+            this.roomService.handleDisconnection(userId, roomId);
+            this.roomClients.get(roomId).delete(client);
+            if (room.users.length === 0) {
+                this.roomClients.delete(roomId);
+                return;
+            }
             const ts = new Date().toISOString();
-            const userDisconnectedEvent: StateChangedEvent = { event: RoomEvents.StateChanged, room: this.room, ts };
-            this.sendToAll(userDisconnectedEvent);
-        })
+            const userDisconnectedEvent: StateChangedEvent = { event: RoomEvents.StateChanged, room, ts };
+            this.sendToRoom(roomId, userDisconnectedEvent);
+        });
 
-        const userConnectedEvent: StateChangedEvent = { event: RoomEvents.StateChanged, room: this.room, ts: new Date().toISOString() };
-        this.sendToAll(userConnectedEvent);
+        const userConnectedEvent: StateChangedEvent = { event: RoomEvents.StateChanged, room, ts: new Date().toISOString() };
+        this.sendToRoom(roomId, userConnectedEvent);
     }
 }
