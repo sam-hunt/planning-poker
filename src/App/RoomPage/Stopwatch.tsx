@@ -1,14 +1,22 @@
+import { useTheme } from '@mui/material';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
-import type { FC } from 'react';
 
 export interface StopwatchProps {
   since: string;
 }
 
-export const Stopwatch: FC<StopwatchProps> = ({ since }) => {
+export const Stopwatch = ({ since }: StopwatchProps) => {
   const ts = useMemo(() => dayjs(since), [since]);
   const [diff, setDiff] = useState<number>(dayjs().diff(ts, 's'));
+
+  const {
+    palette: {
+      warning: { main: warn },
+      error: { main: error },
+    },
+  } = useTheme();
+  const color = diff > 300 ? error : diff > 180 ? warn : 'inherit';
 
   useEffect(() => {
     const interval = setInterval(() => setDiff(dayjs().diff(ts, 's')), 1000);
@@ -21,5 +29,5 @@ export const Stopwatch: FC<StopwatchProps> = ({ since }) => {
   const minutes = (diff - seconds) / 60;
   const mm = minutes.toString().padStart(2, '0');
 
-  return <span>{`${mm}:${ss}`}</span>;
+  return <span style={{ color }}>{`${mm}:${ss}`}</span>;
 };

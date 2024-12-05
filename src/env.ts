@@ -1,1 +1,1 @@
-export const apiWsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:3000/ws';
+export const apiWsUrl = (import.meta.env.VITE_API_WS_URL as string | undefined) ?? 'ws://localhost:3000/ws';

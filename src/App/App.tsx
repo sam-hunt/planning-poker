@@ -1,16 +1,18 @@
-import { UserContextProvider } from 'hooks/use-user-context';
-import { ThemeProvider } from './ThemeProvider';
-import { Header } from './Header';
+import { ThemeProvider } from './Theme/ThemeProvider';
 import { RoomPage } from './RoomPage/RoomPage';
-import './App.css';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
+import { HomePage } from './HomePage/HomePage';
 
 const App = () => (
-  <UserContextProvider>
-    <ThemeProvider>
-      <Header />
-      <RoomPage />
-    </ThemeProvider>
-  </UserContextProvider>
+  <ThemeProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/:roomId" element={<RoomPage />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
+  </ThemeProvider>
 );
 
 export default App;
