@@ -4,5 +4,6 @@ import type { RoomEvents } from '../room-messages.enum';
 
 export interface StateChangedEvent extends RoomMessageBase {
   event: RoomEvents.StateChanged;
+  userId: string;
   room: Room;
 }

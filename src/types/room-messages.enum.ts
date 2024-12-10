@@ -1,10 +1,10 @@
 export enum RoomCommands {
   Resync = 'resync',
-  SetUsername = 'setUsername',
-  SetUserIsSpectating = 'setUserIsSpectating',
+  SetUserOptions = 'setUserOptions',
   SetCard = 'setCard',
   ToggleCardVisibility = 'toggleCardVisibility',
   ResetCards = 'resetCards',
+  SetRoomOptions = 'setRoomOptions',
 }
 
 export enum RoomEvents {

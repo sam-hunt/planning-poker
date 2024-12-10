@@ -26,6 +26,9 @@ export const themeFromMode = (mode: PaletteMode) =>
         paper: mode === 'dark' ? grey[900] : grey[300],
       },
     },
+    shape: {
+      borderRadius: 8,
+    },
     components: {
       MuiLink: {
         defaultProps: {
@@ -35,6 +38,14 @@ export const themeFromMode = (mode: PaletteMode) =>
       MuiButtonBase: {
         defaultProps: {
           LinkComponent: LinkBehavior,
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderWidth: `5px`,
+            borderStyle: 'solid',
+          },
         },
       },
     },
