@@ -1,6 +1,6 @@
 import { SetCardCommand } from './messages/commands/set-card';
-import { SetUserIsSpectatingCommand } from './messages/commands/set-user-is-spectating.command';
-import { SetUsernameCommand } from './messages/commands/set-username.command';
+import { SetRoomOptionsCommand } from './messages/commands/set-room-options.command';
+import { SetUserOptionsCommand } from './messages/commands/set-user-options.command';
 import { RoomMessageBase } from './messages/room-message-base';
 import { RoomCommands } from './messages/room-messages.enum';
 import { User } from './user';
@@ -10,6 +10,8 @@ export class Room {
     public lastResetAt = new Date().toISOString();
     public users: User[] = [];
     public isFirstReveal = true;
+    public leaderId: string = null;
+    public cardOptions: 'fibonacci' | 'tshirt' = 'fibonacci';
 
     constructor(public readonly id: string) {}
 
@@ -25,19 +27,16 @@ export class Room {
         const userIndex = this.users.findIndex(u => u.id === userId);
         this.users.splice(userIndex, 1);
         this.checkShouldReveal();
+        if (this.leaderId === userId) this.leaderId = null;
     }
 
     public handleCommand(userId: string, message: RoomMessageBase): void {
         switch (message.event) {
-            // TODO: Refactor SetUsername and SetUserIsSpectating to combined SetUserDetails
-            case RoomCommands.SetUsername: {
-                const command = message as SetUsernameCommand;
-                this.users.find(u => u.id === userId).name = command.username.slice(0, 16);
-                break;
-            }
-            case RoomCommands.SetUserIsSpectating: {
-                const command = message as SetUserIsSpectatingCommand;
-                this.users.find(u => u.id === userId).isSpectating = command.isSpectating;
+            case RoomCommands.SetUserOptions: {
+                const command = message as SetUserOptionsCommand;
+                const user = this.users.find(u => u.id === userId);
+                user.name = command.name.slice(0, 24);
+                user.isSpectating = command.isSpectating;
                 break;
             }
             case RoomCommands.SetCard: {
@@ -46,24 +45,35 @@ export class Room {
                 this.checkShouldReveal();
                 break;
             }
+            case RoomCommands.SetRoomOptions: {
+                const command = message as SetRoomOptionsCommand;
+                if (this.cardOptions !== command.cardOptions) this.resetCards();
+                this.cardOptions = command.cardOptions;
+                this.leaderId = command.leaderId;
+                break;
+            }
             case RoomCommands.ToggleCardVisibility: {
                 this.isRevealed = !this.isRevealed;
                 break;
             }
             case RoomCommands.ResetCards: {
-                this.isRevealed = false;
-                this.lastResetAt = new Date().toISOString();
-                this.users.forEach(u => void (u.card = null));
-                this.isFirstReveal = true;
+                this.resetCards();
                 break;
             }
         }
     }
 
+    private resetCards(): void {
+        this.isRevealed = false;
+        this.lastResetAt = new Date().toISOString();
+        this.users.forEach(u => void (u.card = null));
+        this.isFirstReveal = true;
+    }
+
     /**
      * Reveal all cards when everyone has picked for the first time after each reset
      **/
-    private checkShouldReveal() {
+    private checkShouldReveal(): void {
         const participants = this.users.filter(u => !u.isSpectating);
         const cardsPickedCount = participants.reduce((acc, u) => (acc += u.card !== null ? 1 : 0), 0);
         if (this.isFirstReveal && !this.isRevealed && cardsPickedCount === participants.length) {
