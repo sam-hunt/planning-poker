@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IconButton, Tooltip } from '@mui/material';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
@@ -12,7 +12,16 @@ export const UserOptionsButton = () => {
   const openUserOptionsDialog = () => setIsUserOptionsDialogOpen(true);
   const closeUserOptionsDialog = () => setIsUserOptionsDialogOpen(false);
 
-  const showUserOptionsDialog = !userOptions.name || isUserOptionsDialogOpen;
+  const [mountDialogDelayPassed, setMountDialogDelayPassed] = useState(false);
+  useEffect(() => {
+    if (userOptions.name) {
+      setMountDialogDelayPassed(false);
+      return;
+    }
+    setTimeout(() => setMountDialogDelayPassed(true), 3000);
+  }, [userOptions.name]);
+
+  const showUserOptionsDialog = (mountDialogDelayPassed && !userOptions.name) || isUserOptionsDialogOpen;
 
   return (
     <>
