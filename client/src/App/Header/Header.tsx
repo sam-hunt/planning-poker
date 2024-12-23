@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router';
-import { AppBar, Toolbar, Typography, Stack } from '@mui/material';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 import CasinoIcon from '@mui/icons-material/Casino';
 
 import { ConnectionButton } from './ConnectionButton';

@@ -1,18 +1,24 @@
+import { useState } from 'react';
+import { LoadingButton } from '@mui/lab';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
-import { Button, FormControl, FormControlLabel, InputAdornment, Stack, Switch, TextField, Typography } from '@mui/material';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 import { useRoom } from '../../hooks/use-room';
-import { LoadingButton } from '@mui/lab';
-import { useState } from 'react';
 import { UserOptions } from '../RoomPage/RoomProvider';
-import { SetUserOptionsCommand } from '../../types/commands/set-user-options.command';
-import { RoomCommands } from '../../types/room-messages.enum';
+import { SetUserOptionsCommand, RoomCommands } from '@planning-poker/protocol';
 
 interface UserOptionsDialogProps {
   onClose: () => void;

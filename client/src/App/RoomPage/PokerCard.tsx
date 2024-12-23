@@ -1,9 +1,13 @@
-import { Box, Card, Stack, Typography, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import DoneIcon from '@mui/icons-material/Done';
-import { useRoom } from '../../hooks/use-room';
 import { useState, type ReactNode } from 'react';
-import type { User } from '../../types/user';
+import { User } from '@planning-poker/protocol';
+import { useRoom } from '../../hooks/use-room';
 
 interface PokerCardProps {
   user: User;

@@ -1,7 +1,7 @@
-import { Stack } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import { User } from '@planning-poker/protocol';
 import { useRoom } from '../../hooks/use-room';
 import { PokerCard } from './PokerCard';
-import type { User } from '../../types/user';
 
 export const PokerCardGrid = () => {
   const { room } = useRoom();

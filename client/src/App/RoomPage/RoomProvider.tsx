@@ -2,12 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { RoomContext } from './RoomContext';
 import { useParams } from 'react-router';
-import { SetUserOptionsCommand } from '../../types/commands/set-user-options.command';
 import useWebSocket, { ReadyState, Options as WsOptions } from 'react-use-websocket';
-import { StateChangedEvent } from '../../types/events/state-changed.event';
-import { RoomMessageBase } from '../../types/room-message-base';
-import { RoomCommands } from '../../types/room-messages.enum';
 import { apiWsUrl } from '../../env';
+import { RoomCommands, RoomMessageBase, SetUserOptionsCommand, StateChangedEvent } from '@planning-poker/protocol';
 
 export type UserOptions = Pick<SetUserOptionsCommand, 'name' | 'isSpectating'>;
 

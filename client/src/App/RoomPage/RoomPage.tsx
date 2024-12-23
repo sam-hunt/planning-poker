@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Grid2';
 import { ActionsPanel } from './ActionsPanel';
 import { PokerCardGrid } from './PokerCardGrid';
