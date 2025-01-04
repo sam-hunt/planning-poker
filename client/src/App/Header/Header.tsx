@@ -8,6 +8,7 @@ import CasinoIcon from '@mui/icons-material/Casino';
 import { ConnectionButton } from './ConnectionButton';
 import { ThemeToggleButton } from './ThemeToggleButton';
 import { UserOptionsButton } from './UserOptionsButton';
+import { OpenGithubButton } from './OpenGithubButton';
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export const Header = () => {
         </Stack>
         <Stack direction="row" gap={{ xs: 0, sm: 1 }}>
           <ConnectionButton />
+          <OpenGithubButton />
           <ThemeToggleButton />
           <UserOptionsButton />
         </Stack>
