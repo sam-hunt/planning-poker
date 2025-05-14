@@ -13,7 +13,6 @@ export class WsGateway implements OnGatewayConnection {
 
   public constructor(private readonly roomService: RoomService) {}
 
-  // TODO: Wrap send function in closure and pass to room to control message flow ?
   private broadcastRoomState(room: Room) {
     const ts = new Date().toISOString();
     const roomClients = this.roomClientsByRoomId.get(room.id);

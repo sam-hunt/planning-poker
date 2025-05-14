@@ -32,6 +32,10 @@ export class Room implements RoomType {
       case RoomCommands.SetUserOptions: {
         user.name = command.name.slice(0, 24);
         user.isSpectating = command.isSpectating;
+        if (user.isSpectating) {
+          user.card = null;
+          this.checkShouldReveal();
+        }
         break;
       }
       case RoomCommands.SetCard: {
